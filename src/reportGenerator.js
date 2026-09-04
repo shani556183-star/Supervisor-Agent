@@ -165,7 +165,7 @@ function generateReport(agents, dateStr, opts = {}) {
         <div class="date">${esc(dateStr)}</div>
       </div>
       <div>
-        <button class="refresh-btn" onclick="location.reload(true)">🔄 Refresh</button>
+        <button class="refresh-btn" id="refresh-btn" onclick="location.reload(true)">🔄 Refresh</button>
         <div class="gen-info">Last generated: ${esc(generatedAtStr)}<br>${refreshNote}</div>
       </div>
     </header>
@@ -185,11 +185,19 @@ function generateReport(agents, dateStr, opts = {}) {
   </div>
 <script>
   // If this file was opened directly (double-click / static archive), a plain
-  // reload just re-shows the same saved snapshot. Make that honest instead of
-  // implying live data.
+  // reload just re-shows the same saved snapshot — that's not what "Refresh"
+  // promises. So on a saved copy, the button instead tries to jump straight
+  // to the live dashboard (server started by the "Check My Agents" icon).
   if (location.protocol === 'file:') {
     var tag = document.getElementById('live-tag');
-    if (tag) tag.textContent = '📄 Saved copy — naya data lene ke liye "Check My Agents" icon dobara chalao';
+    if (tag) tag.textContent = '📄 Saved copy — Refresh dabao to live dashboard khulne ki koshish karega';
+    var btn = document.getElementById('refresh-btn');
+    if (btn) {
+      btn.textContent = '🔄 Refresh (live dashboard kholo)';
+      btn.onclick = function () {
+        window.location.href = 'http://127.0.0.1:47983/';
+      };
+    }
   }
 </script>
 </body>

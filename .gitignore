@@ -1,4 +1,5 @@
 node_modules/
+launcher.log
 
 # Reports contain real client/prospect names, emails and business details
 # pulled from the monitored agents. Keeping them out of git so nothing
