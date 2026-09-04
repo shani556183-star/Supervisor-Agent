@@ -1,0 +1,6 @@
+node_modules/
+
+# Reports contain real client/prospect names, emails and business details
+# pulled from the monitored agents. Keeping them out of git so nothing
+# sensitive ends up on GitHub if this repo is public.
+reports/*.html

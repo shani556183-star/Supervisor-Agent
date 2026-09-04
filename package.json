@@ -1,0 +1,13 @@
+{
+  "name": "supervisor-agent",
+  "version": "1.0.0",
+  "description": "Reads logs/status of 4 local AI-agent projects and writes one combined daily HTML report. Read-only: never modifies any monitored agent.",
+  "main": "run-supervisor.js",
+  "scripts": {
+    "start": "node run-supervisor.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "UNLICENSED"
+}
