@@ -42,7 +42,7 @@ function renderAgentCard(agent) {
   const lastActivity = agent.lastActivity ? new Date(agent.lastActivity).toLocaleString('en-GB') : 'Pata nahi';
 
   return `
-  <div class="card" style="border-left-color:${h.border}">
+  <div class="card" data-health="${esc(agent.health)}" style="border-left-color:${h.border}">
     <div class="card-header">
       <h2>${esc(agent.displayName)}</h2>
       ${badge(agent.health)}
@@ -126,13 +126,21 @@ function generateReport(agents, dateStr, opts = {}) {
   .stat-pill {
     flex: 1; min-width: 130px; border-radius: 10px; padding: 10px 14px;
     display: flex; flex-direction: column; gap: 2px;
+    cursor: pointer; border: 2px solid transparent; user-select: none;
+    transition: transform 0.1s ease, border-color 0.15s ease;
   }
+  .stat-pill:hover { transform: translateY(-1px); }
+  .stat-pill.active { border-color: currentColor; }
+  .stat-pill.disabled { cursor: default; opacity: 0.5; }
+  .stat-pill.disabled:hover { transform: none; }
   .stat-pill .n { font-size: 22px; font-weight: 700; }
   .stat-pill .l { font-size: 12px; opacity: 0.85; }
   .pill-ok { background: #dafbe1; color: #1a7f37; }
   .pill-warn { background: #fff8c5; color: #9a6700; }
   .pill-stopped { background: #eaeef2; color: #57606a; }
   .pill-error { background: #ffebe9; color: #cf222e; }
+  .filter-hint { font-size: 12px; color: #8b949e; margin-top: 10px; }
+  .card.hidden-by-filter { display: none; }
 
   .card {
     background: #fff; border: 1px solid #d0d7de; border-left: 5px solid #d0d7de; border-radius: 10px;
@@ -173,17 +181,40 @@ function generateReport(agents, dateStr, opts = {}) {
     <div class="glance">
       <div class="glance-headline">${summaryHealth === 'ok' ? '✅' : summaryHealth === 'warning' ? '⚠️' : '❌'} ${esc(summaryText)}</div>
       <div class="stat-row">
-        <div class="stat-pill pill-ok"><span class="n">${okCount}</span><span class="l">theek chal rahe hain</span></div>
-        <div class="stat-pill pill-warn"><span class="n">${warnCount}</span><span class="l">dhyan chahiye</span></div>
-        <div class="stat-pill pill-stopped"><span class="n">${stoppedCount}</span><span class="l">aaj nahi chale</span></div>
-        <div class="stat-pill pill-error"><span class="n">${errorCount}</span><span class="l">masla hai</span></div>
+        <div class="stat-pill pill-ok${okCount === 0 ? ' disabled' : ''}" data-health="ok"><span class="n">${okCount}</span><span class="l">theek chal rahe hain</span></div>
+        <div class="stat-pill pill-warn${warnCount === 0 ? ' disabled' : ''}" data-health="warning"><span class="n">${warnCount}</span><span class="l">dhyan chahiye</span></div>
+        <div class="stat-pill pill-stopped${stoppedCount === 0 ? ' disabled' : ''}" data-health="no_run"><span class="n">${stoppedCount}</span><span class="l">aaj nahi chale</span></div>
+        <div class="stat-pill pill-error${errorCount === 0 ? ' disabled' : ''}" data-health="error"><span class="n">${errorCount}</span><span class="l">masla hai</span></div>
       </div>
+      <div class="filter-hint" id="filter-hint">Kisi bhi number par click karo sirf wahi agents dekhne ke liye — dobara click karo sab wapas dikhane ke liye.</div>
     </div>
 
     ${cardsHtml}
     <footer>Supervisor Agent sirf padhta aur report karta hai — koi bhi agent ka code ya data khud nahi badalta.</footer>
   </div>
 <script>
+  // Clicking a summary number filters the cards below to that status.
+  // Clicking the same number again (or it's already active) clears the filter.
+  (function () {
+    var pills = document.querySelectorAll('.stat-pill:not(.disabled)');
+    var cards = document.querySelectorAll('.card');
+    pills.forEach(function (pill) {
+      pill.addEventListener('click', function () {
+        var alreadyActive = pill.classList.contains('active');
+        document.querySelectorAll('.stat-pill').forEach(function (p) { p.classList.remove('active'); });
+        if (alreadyActive) {
+          cards.forEach(function (c) { c.classList.remove('hidden-by-filter'); });
+          return;
+        }
+        pill.classList.add('active');
+        var health = pill.getAttribute('data-health');
+        cards.forEach(function (c) {
+          c.classList.toggle('hidden-by-filter', c.getAttribute('data-health') !== health);
+        });
+      });
+    });
+  })();
+
   // If this file was opened directly (double-click / static archive), a plain
   // reload just re-shows the same saved snapshot — that's not what "Refresh"
   // promises. So on a saved copy, the button instead tries to jump straight
