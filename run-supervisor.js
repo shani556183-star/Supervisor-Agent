@@ -45,7 +45,7 @@ function main() {
   }
 
   const dateStr = todayISO();
-  const html = generateReport(results, dateStr);
+  const html = generateReport(results, dateStr, { generatedAt: new Date(), isLive: false });
 
   const reportsDir = path.join(__dirname, 'reports');
   if (!fs.existsSync(reportsDir)) fs.mkdirSync(reportsDir, { recursive: true });

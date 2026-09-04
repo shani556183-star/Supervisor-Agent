@@ -25,11 +25,33 @@ Cafebot abhi shamil nahi hai (project ready nahi hai).
 
 ## Report kaise dekhein
 
-- **Manually turant dekhna ho:** `run-supervisor.bat` par double-click karo —
-  report ban kar seedha browser mein khul jayega
-- **Roz automatic:** Windows Task Scheduler mein ek task ban chuka hai
-  (`Supervisor Agent Daily Report`) jo roz **9:30 AM** ko chalta hai. Us waqt
-  ke baad `reports/latest.html` ko open kar sakte ho (double-click karo).
+### Sabse aasan tareeqa: "Check My Agents" icon
+
+Desktop par ek icon hai **"Check My Agents"**. Bas usay double-click karo:
+
+- Supervisor turant fresh data padhta hai
+- Dashboard khud browser mein khul jata hai
+- Dashboard ke andar ek **🔄 Refresh** button hai — usay dabao to bina kuch
+  aur khole, seedha naya data dikh jayega (koi .bat dobara chalane ki zaroorat
+  nahi)
+
+Pehli baar khulne mein 1-2 second lag sakta hai — bilkul normal hai, ye
+background mein chhota sa local program start ho raha hota hai. Isay band
+karne ki zaroorat nahi, agle din phir se icon double-click karoge to ye khud
+sambhal lega.
+
+### Roz automatic (background mein)
+
+Windows Task Scheduler mein ek task ban chuka hai (`Supervisor Agent Daily
+Report`) jo roz **9:30 AM** ko khud chalta hai aur ek saved copy
+`reports/latest.html` mein rakh deta hai — taake agar tum "Check My Agents"
+na bhi kholo, phir bhi ek record maujood rahe.
+
+### Manual (bina live dashboard ke)
+
+`run-supervisor.bat` par double-click karne se bhi ek saved report ban kar
+browser mein khulti hai — lekin isme Refresh button live data nahi layega
+(sirf "Check My Agents" wala live dashboard aisa karta hai).
 
 ## Task Scheduler check/change karna ho
 
@@ -44,12 +66,21 @@ Cafebot abhi shamil nahi hai (project ready nahi hai).
 ```
 config/agents.json       -- har agent ka path aur naam
 src/collectors/          -- har agent ke liye alag reader
-src/reportGenerator.js   -- HTML report banata hai
-run-supervisor.js        -- sab kuch chalata hai
-run-supervisor.bat       -- double-click launcher (report khol deta hai)
+src/reportGenerator.js   -- HTML dashboard banata hai
+run-supervisor.js        -- one-shot: ek saved report file banata hai
+server.js                -- live dashboard: har request par fresh data deta hai
+check-my-agents.vbs      -- Desktop icon jo server.js ko hidden chalata hai
+run-supervisor.bat       -- double-click launcher (saved report khol deta hai)
 run-supervisor-silent.bat-- scheduled task ke liye (background mein chalta hai)
-reports/                 -- roz ki reports (date-wise + latest.html)
+reports/                 -- roz ki saved reports (date-wise + latest.html)
 ```
+
+## Agar "Check My Agents" kaam na kare
+
+Ye bohot rare hoga, lekin agar double-click karne par browser na khule:
+
+1. Dubara double-click karo (kabhi kabhi pehli baar thoda slow hota hai)
+2. Ya seedha browser mein ye address kholo: `http://127.0.0.1:47983/`
 
 ## Note: reports GitHub par nahi jaati
 
